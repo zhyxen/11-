@@ -1,0 +1,52 @@
+import nltk
+from nltk.corpus import gutenberg
+from nltk.probability import FreqDist
+from nltk.corpus import stopwords
+import string
+import matplotlib.pyplot as plt
+
+# Завантаження необхідних словників
+nltk.download('gutenberg')
+nltk.download('stopwords')
+nltk.download('punkt')
+
+# --- 1. Завантаження тексту ---
+file_id = 'blake-poems.txt'
+words = gutenberg.words(file_id)
+
+# --- 2. Визначення кількості слів ---
+total_words = len(words)
+print(f"Текст: {file_id}")
+print(f"Загальна кількість слів: {total_words}")
+
+# --- 3. Топ-10 слів (без очищення) та Діаграма №1 ---
+fdist_raw = FreqDist(words)
+print("\nТоп-10 слів (сирі дані):")
+print(fdist_raw.most_common(10))
+
+plt.figure(figsize=(10, 5))
+fdist_raw.plot(10, title="Топ-10 слів (до очищення)")
+plt.show()  # Це виведе першу діаграму
+
+# --- 4. Очищення тексту та Діаграма №2 ---
+stop_words = set(stopwords.words('english'))
+punctuation = set(string.punctuation)
+
+# Фільтрація: видаляємо стоп-слова, пунктуацію та приводимо до нижнього регістру
+clean_words = [
+    w.lower() for w in words 
+    if w.lower() not in stop_words 
+    and w not in punctuation 
+    and w.isalnum()
+]
+
+print(f"\nКількість слів після очищення: {len(clean_words)}")
+
+# Топ-10 слів після очищення
+fdist_clean = FreqDist(clean_words)
+print("\nТоп-10 слів (після очищення):")
+print(fdist_clean.most_common(10))
+
+plt.figure(figsize=(10, 5))
+fdist_clean.plot(10, title="Топ-10 слів (після очищення)")
+plt.show()  # Це виведе другу діаграму
