@@ -1,0 +1,48 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Завантаження даних з CSV файлу
+filename = 'comptagevelo2015.csv'
+df = pd.read_csv(filename)
+
+# 2. Попередня обробка даних
+# Перетворимо стовпець 'Date' у формат datetime (день/місяць/рік)
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True)
+
+# Встановимо дату як індекс (це зручно для графіків часових рядів)
+df.set_index('Date', inplace=True)
+
+# Видалимо зайвий стовпець з часом, якщо він є
+if 'Unnamed: 1' in df.columns:
+    df.drop(columns=['Unnamed: 1'], inplace=True)
+
+# 3. Аналіз даних
+print("--- Перші 5 рядків ---")
+print(df.head())
+
+print("\n--- Загальна статистика для велодоріжки 'Berri1' ---")
+print(df['Berri1'].describe())
+
+# Знайдемо день з максимальною кількістю велосипедистів на Berri1
+max_date = df['Berri1'].idxmax()
+max_count = df['Berri1'].max()
+print(f"\nМаксимальна кількість на Berri1: {max_count} (дата: {max_date.date()})")
+
+# Знайдемо найпопулярнішу велодоріжку за весь рік (сума всіх поїздок)
+total_trips = df.sum().sort_values(ascending=False)
+print("\n--- Топ-3 найпопулярніші велодоріжки за рік ---")
+print(total_trips.head(3))
+
+# 4. Побудова графіку
+plt.figure(figsize=(12, 6))
+# Побудуємо графік для Berri1
+df['Berri1'].plot(label='Berri1', color='blue')
+plt.title('Динаміка руху велосипедистів по велодоріжці Berri1 (2015 рік)')
+plt.xlabel('Дата')
+plt.ylabel('Кількість велосипедистів')
+plt.legend()
+plt.grid(True)
+
+# Збереження графіку у файл
+plt.savefig('bike_plot.png')
+plt.show()
